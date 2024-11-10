@@ -1,0 +1,19 @@
+
+#+title: "C server pages"
+
+
+* What is it?
+
+A templating language with embedded C syntax. 
+
+* Why, AKA: Time is a flat circle
+
+Inspired by a recent [[https://www.youtube.com/watch?v=dkNv3KGOFT0&pp=ygUHdHNvZGluZw%3D%3D][Tsoding Daily implementing the same idea]], I went
+ahead and wrote one of my own, but with a {{ handlebars }} syntax to
+avoid the %-escape issue Alexey mentioned near the end of the VOD. I
+also added a file pointer variable so this could be used in-memory as
+well.
+
+I just found it funny because this is basically Java Server Pages
+(hence the title) in C. Whether or not that is a good thing is up to
+the reader.
