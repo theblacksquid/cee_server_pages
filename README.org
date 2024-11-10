@@ -4,16 +4,54 @@
 
 * What is it?
 
-A templating language with embedded C syntax. 
+A templating engine with embedded C syntax.
+
+* Usage
+
+1. Write the template in any text format you wish. You can include any
+   arbitrary C within '{{' and '}}' snippets.
+
+#+begin_src html
+  <h1>{{ fprintf(fileptr, "%d", your_variable) }}% complete</h1>
+#+end_src
+
+   When you wish to display a given variable, it is recommended you do
+   it in the form:
+
+#+begin_src c
+  fprintf(fileptr, "%d", your_variable);
+#+end_src
+
+   where fileptr is of type (FILE *). The variable name might become
+   configurable in the future but for now, it MUST be named fileptr
+
+2. Compile the template into an .h file
+
+#+begin_src sh
+  cee_templ < template.htm > template.h
+#+end_src
+
+   It is recommended you add this line to your build script or
+   makefile. See this repository's makefile for examples
+
+3. Write a function which includes the above .h file which MUST
+   include one parameter of type (FILE *) named fileptr
+
+#+begin_src c
+  void example_template(FILE *fileptr)
+  {
+      #include "template.htm"
+  }
+#+end_src
 
 * Why, AKA: Time is a flat circle
 
-Inspired by a recent [[https://www.youtube.com/watch?v=dkNv3KGOFT0&pp=ygUHdHNvZGluZw%3D%3D][Tsoding Daily implementing the same idea]], I went
-ahead and wrote one of my own, but with a {{ handlebars }} syntax to
-avoid the %-escape issue Alexey mentioned near the end of the VOD. I
-also added a file pointer variable so this could be used in-memory as
-well.
+Inspired by a recent [[https://www.youtube.com/watch?v=dkNv3KGOFT0&pp=ygUHdHNvZGluZw%3D%3D][Tsoding Daily stream VOD implementing the same
+idea]], I went ahead and wrote one of my own, but with a {{ handlebars
+}} syntax to avoid the %-escape issue Alexey mentioned near the end of
+the VOD. I also added a file pointer variable so this could be used
+in-memory as well.
 
 I just found it funny because this is basically Java Server Pages
-(hence the title) in C. Whether or not that is a good thing is up to
+in C (hence the title) . Whether or not that is a good thing is up to
 the reader.
