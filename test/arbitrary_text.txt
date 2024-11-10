@@ -4,10 +4,13 @@ be used to format arbitrary text files.
 
 \{\{ this should show up as plain text surrounded by handlebars \}\}
 
-Five hundred: {{ fprintf(fileptr, "%d\n", 5 * 10 * 10); }}
+Five hundred: {{ fprintf(fileptr, "%d\\n", 5 * 10 * 10); }}
 
 here's a shopping list:
 
 {{ for ( int index = 0; index < 5; index++ ) { }}
 - {{ fprintf(fileptr, "%s", list[index]); }}
 {{ } }}
+
+\\\\\\\\\\ <-- This should write five slashes
+

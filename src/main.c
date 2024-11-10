@@ -87,7 +87,7 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
 		    last_char_is_open_curly = 1;
 		}
 
-	        if ( to_escape )
+	        if ( to_escape && !is_c_mode )
 		{
 		    append_byte_literal(&workpiece, '{', context);
 		    to_escape = 0;
@@ -110,7 +110,7 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
 		    last_char_is_close_curly = 1;
 		}
 
-	        if ( to_escape )
+	        if ( to_escape && !is_c_mode )
 		{
 		    append_byte_literal(&workpiece, '}', context);
 		    to_escape = 0;
