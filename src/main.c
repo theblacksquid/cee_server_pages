@@ -62,13 +62,17 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
     int last_char_is_open_curly = 0;
     int last_char_is_close_curly = 0;
     int is_c_mode = 0;
+    int to_escape = 0;
 
     begin_byte_literals(&workpiece, context);
 
     for ( int index = 0; index < length; index++ )
     {
+	template_byte_handler handler = append_byte_literal;
+	if ( is_c_mode ) handler = append_byte_cee;
+	
 	switch ( buffer[index] )
-	{
+	{   
 	    case '{':
 	    {
 		if ( last_char_is_open_curly && !is_c_mode )
@@ -78,9 +82,16 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
 		    end_byte_literals(&workpiece, context);
 		}
 
-		else
+		else if ( !to_escape )
 		{
 		    last_char_is_open_curly = 1;
+		}
+
+	        if ( to_escape )
+		{
+		    append_byte_literal(&workpiece, '{', context);
+		    to_escape = 0;
+		    last_char_is_open_curly = 0;
 		}
 	    }
 	    break;
@@ -94,19 +105,30 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
 		    begin_byte_literals(&workpiece, context);
 		}
 
-		else
+		else if ( !to_escape )
 		{
 		    last_char_is_close_curly = 1;
 		}
+
+	        if ( to_escape )
+		{
+		    append_byte_literal(&workpiece, '}', context);
+		    to_escape = 0;
+		    last_char_is_open_curly = 0;
+		}
+	    }
+	    break;
+
+	    case '\\':
+	    {
+		if ( to_escape ) handler(&workpiece, '\\', context);
+		
+		to_escape = !to_escape;
 	    }
 	    break;
 
 	    default:
 	    {
-		template_byte_handler handler = append_byte_literal;
-
-		if ( is_c_mode ) handler = append_byte_cee;
-
 		if ( last_char_is_open_curly )
 		{
 		    handler(&workpiece, '{', context);
@@ -120,6 +142,7 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
 		}
 
 	        handler(&workpiece, buffer[index], context);
+		to_escape = 0;
 	    }
 	}
     }
@@ -184,10 +207,10 @@ ltbs_cell *serialize_formatted_output(ltbs_cell *workpiece, Arena *context)
 	}
     }
 
+    result = String_Vt.copy(string_builder, context);
+
     arena_free(workspace);
     free(workspace);
-
-    result = String_Vt.copy(string_builder, context);
 
     return result;
 }

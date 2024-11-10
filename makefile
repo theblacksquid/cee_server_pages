@@ -16,11 +16,20 @@ cee_templ: src/main.c src/libblacksquid.h
 test/index.h: test/index.htm cee_templ
 	./cee_templ < test/index.htm > test/index.h
 
+test/arbitrary_text.h: test/arbitrary_text.txt
+	./cee_templ < test/arbitrary_text.txt > test/arbitrary_text.h
+
 test_tmpl: test/test_cee_templates.c test/index.h cee_templ
 	gcc $(FLAGS_DEFAULT) test/test_cee_templates.c -o test_tmpl;
 	./test_tmpl;
+
+plaintext_test: cee_templ test/plaintext_test.c test/arbitrary_text.h
+	gcc $(FLAGS_DEFAULT) test/plaintext_test.c -o plaintext_test;
+	./plaintext_test;
 
 clean:
 	-rm ./cee_templ;
 	-rm ./test_tmpl;
 	-rm ./test/index.h
+	-rm ./plaintext_test
+	-rm ./test/arbitrary_text.h
