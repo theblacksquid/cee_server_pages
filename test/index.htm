@@ -1,0 +1,16 @@
+
+<html>
+    <head>
+	{{ fprintf(fileptr, page_title); }}
+    </head>
+    <body>
+	<p>
+	    trying to render a list below:
+	</p>
+	<ul>
+	    {{ for ( int index = 0; index < 10; index++ ) { }}
+	    <li> {{ fprintf(fileptr, "%d", index); }} </li>
+	    {{ } }}
+	</ul>
+    </body>
+</html>

@@ -47,7 +47,7 @@ int main()
 
     ltbs_cell *result = cee_template_compile(&input_cell, context);
 
-    fprintf(stdout, "%s", result->data.string.strdata);
+    fprintf(stdout, "%s\n", result->data.string.strdata);
     
     arena_free(context);
     free(context);
@@ -59,13 +59,9 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
     ltbs_cell *reversed;
     int length = template->data.string.length;
     char *buffer = template->data.string.strdata;
-
-    int output_length = 0;
-
     int last_char_is_open_curly = 0;
     int last_char_is_close_curly = 0;
     int is_c_mode = 0;
-    int c_code_length = 0;
 
     begin_byte_literals(&workpiece, context);
 
@@ -136,13 +132,13 @@ ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
 
 void begin_byte_literals(ltbs_cell **workpiece, Arena *context)
 {
-    ltbs_cell *to_add = String_Vt.cs("fprintf(fileptr, \"", context);
+    ltbs_cell *to_add = String_Vt.cs("\nfprintf(fileptr, \"", context);
     *workpiece = List_Vt.cons(to_add, *workpiece, context);
 }
 
 void end_byte_literals(ltbs_cell **workpiece, Arena *context)
 {
-    ltbs_cell *to_add = String_Vt.cs("\");", context);
+    ltbs_cell *to_add = String_Vt.cs("\");\n", context);
     *workpiece = List_Vt.cons(to_add, *workpiece, context);
 }
 
@@ -155,6 +151,7 @@ void append_byte_literal(ltbs_cell **workpiece, char c, Arena *context)
     
     FILE *as_file = fmemopen(buffer, 10, "w");
     fprintf(as_file, "\\x%02x", c);
+    fclose(as_file);
     
     ltbs_cell *to_add = String_Vt.cs(buffer, context);
     *workpiece = List_Vt.cons(to_add, *workpiece, context);
@@ -183,7 +180,7 @@ ltbs_cell *serialize_formatted_output(ltbs_cell *workpiece, Arena *context)
 	      tracker = List_Vt.rest(tracker) )
 	{
 	    ltbs_cell *head = List_Vt.head(tracker);
-	    string_builder = String_Vt.append(string_builder, head, workspace);
+	    string_builder = String_Vt.append(head, string_builder, workspace);
 	}
     }
 
