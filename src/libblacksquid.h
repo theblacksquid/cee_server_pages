@@ -109,13 +109,12 @@ typedef void (*callback_fn)(ltbs_cell *cell, void *param);
 #define pair_iterate(to_iter, head, tracker, ...) { for ( ltbs_cell *tracker = to_iter; pair_head(tracker); tracker = pair_rest(tracker) ) { ltbs_cell *head = pair_head(tracker); __VA_ARGS__ } } 
 
 #define hashmap_from_kvps(hashmap, context, ...) {                          \
-    hashmap = hash_make(context);	                                    \
     ltbs_keyvaluepair *kvp_list =                                           \
 	(ltbs_keyvaluepair[]) { __VA_ARGS__, {0,0} };			    \
     for (int index = 0; kvp_list[index].key != 0; index++ )                 \
     {                                                                       \
-        ltbs_cell *key = string_from_cstring(kvp_list[index].key, context); \
-        hash_upsert(                                                        \
+        ltbs_cell *key = String_Vt.cs(kvp_list[index].key, context);        \
+        Hash_Vt.upsert(                                                     \
 	    &hashmap,                                                       \
             key,                                                            \
 	    kvp_list[index].value,                                          \

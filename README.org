@@ -9,7 +9,9 @@ A templating engine with embedded C syntax.
 * Usage
 
 1. Write the template in any text format you wish. You can include any
-   arbitrary C within '{{' and '}}' snippets.
+   arbitrary C within '{{' and '}}' snippets. Curly brace literals are
+   escaped with backslashes. Backslash literals are written as two
+   backslashes
 
    #+begin_src html
      <h1>{{ fprintf(fileptr, "%d", your_variable) }}% complete</h1>

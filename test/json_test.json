@@ -1,0 +1,15 @@
+[
+    {{ for ( ltbs_cell *tracker = obj_list;
+	     List_Vt.head(tracker);
+	     tracker = List_Vt.rest(tracker) ) { }}
+     {{
+           ltbs_cell *head =  List_Vt.head(tracker);
+	   int id = Hash_Vt.lookup(&head, "id")->data.integer;
+	   char *username = Hash_Vt.lookup(&head, "username")->data.string.strdata;
+      }}
+     \{
+          "id": {{ fprintf(fileptr, "%d", id); }},
+          "username": "{{ fprintf(fileptr, "%s", username); }}"
+     \},
+     {{ } }}
+]
