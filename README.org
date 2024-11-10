@@ -48,7 +48,7 @@ A templating engine with embedded C syntax.
    include one parameter of type (FILE *) named fileptr
 
    #+begin_src c
-     void example_template(FILE *fileptr)
+     void example_template(FILE *fileptr, int your_variable)
      {
          #include "template.htm"
      }
