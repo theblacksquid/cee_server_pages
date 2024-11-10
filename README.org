@@ -38,7 +38,8 @@ A templating engine with embedded C syntax.
 2. Compile the template into an .h file
 
    #+begin_src sh
-     cee_templ < template.htm > template.h
+     cee_templ < template.htm > template.h; # or
+     cat template.htm | cee_templ > template.h;
    #+end_src
 
    It is recommended you add this line to your build script or
