@@ -11,25 +11,35 @@ A templating engine with embedded C syntax.
 1. Write the template in any text format you wish. You can include any
    arbitrary C within '{{' and '}}' snippets.
 
-#+begin_src html
-  <h1>{{ fprintf(fileptr, "%d", your_variable) }}% complete</h1>
-#+end_src
+   #+begin_src html
+     <h1>{{ fprintf(fileptr, "%d", your_variable) }}% complete</h1>
+   #+end_src
+
+   You can also do loops:
+
+   #+begin_src html
+     <ul>
+     {{ for ( int index = 0; index < 10; index++ ) { }}
+	 <li> {{ fprintf(fileptr, "%d", index); }} </li>
+     {{ } }}
+     </ul>
+   #+end_src
 
    When you wish to display a given variable, it is recommended you do
    it in the form:
 
-#+begin_src c
-  fprintf(fileptr, "%d", your_variable);
-#+end_src
+   #+begin_src c
+     fprintf(fileptr, "%d", your_variable);
+   #+end_src
 
    where fileptr is of type (FILE *). The variable name might become
-   configurable in the future but for now, it MUST be named fileptr
+   configurable in the future but for now, it MUST be named fileptr.
 
 2. Compile the template into an .h file
 
-#+begin_src sh
-  cee_templ < template.htm > template.h
-#+end_src
+   #+begin_src sh
+     cee_templ < template.htm > template.h
+   #+end_src
 
    It is recommended you add this line to your build script or
    makefile. See this repository's makefile for examples
@@ -37,12 +47,12 @@ A templating engine with embedded C syntax.
 3. Write a function which includes the above .h file which MUST
    include one parameter of type (FILE *) named fileptr
 
-#+begin_src c
-  void example_template(FILE *fileptr)
-  {
-      #include "template.htm"
-  }
-#+end_src
+   #+begin_src c
+     void example_template(FILE *fileptr)
+     {
+         #include "template.htm"
+     }
+   #+end_src
 
 * Why, AKA: Time is a flat circle
 
