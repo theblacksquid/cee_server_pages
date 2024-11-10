@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context);
 typedef void (*template_byte_handler)(ltbs_cell **workpiece, char c, Arena *context);
@@ -15,42 +16,64 @@ void end_byte_literals(ltbs_cell **workpiece, Arena *context);
 
 ltbs_cell *serialize_formatted_output(ltbs_cell *workpiece, Arena *context);
 
-int main()
+int main(int argc, char *argv[])
 {
     Arena *context = malloc(sizeof(Arena));
     *context = (Arena) {0};
     
     int length = 0;
-    fseek(stdin, 0L, SEEK_END);
-    length = ftell(stdin);
-    rewind(stdin);
+    char *buffer = "";
+    struct stat st = {0};
 
-    char *buffer = arena_alloc(context, length);
-
-    for ( int index = 0; index < length + 1; index++ )
-        buffer[index] = 0;
-
-    fread(buffer, 1, length, stdin);
-
-    ltbs_cell input_cell =
+    if ( fstat(STDIN_FILENO, &st) == -1 )
     {
-	.type = LTBS_STRING,
-	.data =
-	{
-	    .string =
-	    {
-		.length = length,
-		.strdata = buffer
-	    }
-	}
-    };
+	perror("fstat error");
+	arena_free(context);
+	free(context);
+	exit(EXIT_FAILURE);
+    }
 
-    ltbs_cell *result = cee_template_compile(&input_cell, context);
+    if ( (st.st_mode & S_IFMT) == S_IFIFO )
+    {
+	/* printf("is pipe\n"); */
+	unsigned char internal_buffer[1024] = "";
+
+	while (read(STDIN_FILENO, internal_buffer, 1024))
+	{
+	    ltbs_cell *right = String_Vt.cs(internal_buffer, context);
+	    ltbs_cell *left = String_Vt.cs(buffer, context);
+	    buffer = String_Vt.append(left, right, context)->data.string.strdata;
+
+	    for ( int index = 0; index < 1000; index++ )
+		internal_buffer[index] = 0;
+	}
+    }
+
+    else
+    {
+	/* printf("is regular file\n"); */
+	fseek(stdin, 0L, SEEK_END);
+	length = ftell(stdin);
+	rewind(stdin);
+
+	buffer = arena_alloc(context, length);
+
+	for ( int index = 0; index < length + 1; index++ )
+	    buffer[index] = 0;
+
+	fread(buffer, 1, length, stdin);	
+    }
+
+    ltbs_cell *input_cell = String_Vt.cs(buffer, context);
+
+    ltbs_cell *result = cee_template_compile(input_cell, context);
 
     fprintf(stdout, "%s\n", result->data.string.strdata);
     
     arena_free(context);
     free(context);
+
+    return 0;
 }
 
 ltbs_cell *cee_template_compile(ltbs_cell *template, Arena *context)
